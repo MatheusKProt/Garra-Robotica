@@ -18,22 +18,22 @@ export default function Dashboard() {
   useEffect(() => {
     function handleKeydown(event) {
       if (event.key === "q") {
-        socket.emit("x", { action: "plus" });
+        socket.emit("rotation", { action: "plus" });
         return;
       } else if (event.key === "a") {
-        socket.emit("x", { action: "minus" });
+        socket.emit("rotation", { action: "minus" });
         return;
       } else if (event.key === "w") {
-        socket.emit("y", { action: "plus" });
+        socket.emit("elevation", { action: "plus" });
         return;
       } else if (event.key === "s") {
-        socket.emit("y", { action: "minus" });
+        socket.emit("elevation", { action: "minus" });
         return;
       } else if (event.key === "e") {
-        socket.emit("z", { action: "plus" });
+        socket.emit("extension", { action: "plus" });
         return;
       } else if (event.key === "d") {
-        socket.emit("z", { action: "minus" });
+        socket.emit("extension", { action: "minus" });
         return;
       } else if (event.key === "r") {
         socket.emit("gripper", { action: "plus" });

@@ -29,9 +29,9 @@ io.on("connection", socket => {
   connectedUsers[user_id] = socket.id;
 
   socket.on("xyz", PositionController.xyz);
-  socket.on("x", PositionController.x);
-  socket.on("y", PositionController.y);
-  socket.on("z", PositionController.z);
+  socket.on("rotation", PositionController.rotation);
+  socket.on("elevation", PositionController.elevation);
+  socket.on("extension", PositionController.extension);
   socket.on("gripper", PositionController.gripper);
 });
 

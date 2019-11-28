@@ -2,9 +2,6 @@ const math = require("mathjs");
 const Position = require("../models/Position.js");
 
 module.exports = {
-  async index(request, response) {
-    const { x, y, z } = request.params;
-  },
   async store(request, response) {
     function toRadians(angle) {
       return angle * (Math.PI / 180);
