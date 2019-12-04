@@ -89,8 +89,10 @@ export default function Dashboard() {
       <form className="xyz" onSubmit={handleSubmit}>
         <label htmlFor="x">X:</label>
         <input
-          type="text"
+          type="number"
           id="x"
+          min="-39"
+          max="39"
           placeholder="Insira um valor"
           value={x}
           onChange={event => setX(event.target.value)}
@@ -98,8 +100,10 @@ export default function Dashboard() {
 
         <label htmlFor="y">Y:</label>
         <input
-          type="text"
+          type="number"
           id="y"
+          min="-39"
+          max="39"
           placeholder="Insira um valor"
           value={y}
           onChange={event => setY(event.target.value)}
@@ -107,8 +111,10 @@ export default function Dashboard() {
 
         <label htmlFor="z">Z:</label>
         <input
-          type="text"
+          type="number"
           id="z"
+          min="16"
+          max="54"
           placeholder="Insira um valor"
           value={z}
           onChange={event => setZ(event.target.value)}

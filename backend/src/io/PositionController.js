@@ -2,7 +2,7 @@ const Position = require("../models/Position.js");
 const axios = require("axios");
 
 const api = axios.create({
-  baseURL: "http://192.168.1.150"
+  baseURL: "http://192.168.0.150"
 });
 
 const pos = {
@@ -24,10 +24,10 @@ const extensionMax = 40;
 const gripperMin = 0;
 const gripperMax = 100;
 
-const rotationStep = 10;
+const rotationStep = 7.5833;
 const elevationStep = 10;
-const extensionStep = 20;
-const gripperStep = 10;
+const extensionStep = 77.777;
+const gripperStep = 35;
 
 async function getPosition() {
   return (position = await Position.findOne({
@@ -66,46 +66,20 @@ module.exports = {
         console.log("y: ", Math.round(position.y * 100) / 100);
         console.log("z: ", Math.round(position.z * 100) / 100);
 
-        const newRotation = rotationStep * (beta - pos.rotation);
-        if (newRotation !== 0) {
-          try {
-            await api.get("/?rotation=" + newRotation);
-          } catch {}
-          pos.rotation = beta;
-        }
-
-        const newElevation = elevationStep * (theta - pos.elevation);
-        if (newElevation !== 0) {
-          try {
-            await api.get("/?elevation=" + newElevation);
-          } catch {}
-          pos.elevation = theta;
-        }
-
-        const newExtension = extensionStep * (alpha - pos.extension);
-        if (newExtension !== 0) {
-          try {
-            await api.get("/?extension=" + newExtension);
-          } catch {}
-          pos.extension = alpha;
-        }
+        await api.get(`/?rotation=${Number(beta) * rotationStep}`);
+        await api.get(`/?elevation=${-(Number(theta) * elevationStep)}`);
+        await api.get(`/?extension=${(Number(alpha) - 30) * extensionStep}`);
+        pos.rotation = beta;
+        pos.elevation = theta;
+        pos.extension = alpha;
       } else {
         console.log("Pontos não existem!");
       }
     }
 
     if (gripper) {
-      console.log(pos);
-
-      gripper = Number(gripper);
-      const newGripper = gripperStep * (gripper - pos.gripper);
-      if (newGripper !== 0) {
-        pos.gripper = gripper;
-        try {
-          await api.get("/?gripper=" + newGripper);
-        } catch {}
-      }
-      console.log(pos);
+      await api.get(`?gripper=${-(Number(gripper) * gripperStep)}`);
+      pos.gripper = gripper;
     }
   },
   async rotation(data) {
@@ -116,16 +90,12 @@ module.exports = {
       pos.rotation += 1;
       position = await getPosition();
 
-      try {
-        await api.get("/?rotation=" + rotationStep);
-      } catch {}
+      await api.get(`/?rotation=${Number(position.beta) * rotationStep}`);
     } else if (action === "minus" && pos.rotation > rotationMin) {
       pos.rotation -= 1;
       position = await getPosition();
 
-      try {
-        await api.get("/?rotation=" + -rotationStep);
-      } catch {}
+      await api.get(`/?rotation=${Number(position.beta) * rotationStep}`);
     }
     console.log("");
     console.log("x: ", Math.round(position.x * 100) / 100);
@@ -140,16 +110,12 @@ module.exports = {
       pos.elevation += 1;
       position = await getPosition();
 
-      try {
-        await api.get("/?elevation=" + elevationStep);
-      } catch {}
+      await api.get(`/?elevation=${-(Number(position.theta) * elevationStep)}`);
     } else if (action === "minus" && pos.elevation > elevationMin) {
       pos.elevation -= 1;
       position = await getPosition();
 
-      try {
-        await api.get("/?elevation=" + -elevationStep);
-      } catch {}
+      await api.get(`/?elevation=${-(Number(position.theta) * elevationStep)}`);
     }
     console.log("");
     console.log("x: ", Math.round(position.x * 100) / 100);
@@ -164,16 +130,16 @@ module.exports = {
       pos.extension += 1;
       position = await getPosition();
 
-      try {
-        await api.get("/?extension=" + extensionStep);
-      } catch {}
+      await api.get(
+        `/?extension=${(Number(position.alpha) - 30) * extensionStep}`
+      );
     } else if (action === "minus" && pos.extension > extensionMin) {
       pos.extension -= 1;
       position = await getPosition();
 
-      try {
-        await api.get("/?extension=" + -extensionStep);
-      } catch {}
+      await api.get(
+        `/?extension=${(Number(position.alpha) - 30) * extensionStep}`
+      );
     }
     console.log("");
     console.log("x: ", Math.round(position.x * 100) / 100);
@@ -186,15 +152,11 @@ module.exports = {
     if (action === "plus" && pos.gripper < gripperMax) {
       pos.gripper += 1;
 
-      try {
-        await api.get("/?gripper=" + gripperStep);
-      } catch {}
+      await api.get(`?gripper=${-(Number(pos.gripper) * gripperStep)}`);
     } else if (action === "minus" && pos.gripper > gripperMin) {
       pos.gripper -= 1;
 
-      try {
-        await api.get("/?gripper=" + -gripperStep);
-      } catch {}
+      await api.get(`?gripper=${-(Number(pos.gripper) * gripperStep)}`);
     }
   }
 };

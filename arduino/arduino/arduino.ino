@@ -1,16 +1,16 @@
 #include <SPI.h>
 #include <Ethernet.h>
-#include <Stepper.h>
+#include <AccelStepper.h>
 
-#define passosPorVolta 500
+#define HALFSTEP 8
 
-Stepper motor1(passosPorVolta, 38, 40, 39, 41);
-Stepper motor2(passosPorVolta, 42, 44, 43, 45);
-Stepper motor3(passosPorVolta, 46, 48, 47, 49);
-Stepper motor4(passosPorVolta, 50, 52, 51, 53);
+AccelStepper motor1(HALFSTEP, 46, 48, 47, 49);
+AccelStepper motor2(HALFSTEP, 42, 44, 43, 45);
+AccelStepper motor3(HALFSTEP, 38, 40, 39, 41);
+AccelStepper motor4(HALFSTEP, 34, 36, 35, 37);
 
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = {192, 168, 1, 150};
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xAD };
+byte ip[] = {192, 168, 0, 150};
 
 EthernetServer server(80);
 
@@ -22,10 +22,22 @@ void setup(){
   Ethernet.begin(mac, ip);
   server.begin();
 
-  motor1.setSpeed(70);
-  motor2.setSpeed(70);
-  motor3.setSpeed(70);
-  motor4.setSpeed(70);
+  motor1.setMaxSpeed(300.0);
+  motor1.setAcceleration(20.0);
+  motor1.moveTo(0);
+
+  motor2.setMaxSpeed(300.0);
+  motor2.setAcceleration(20.0);
+  motor2.moveTo(0);
+
+  motor3.setMaxSpeed(300.0);
+  motor3.setAcceleration(20.0);
+  motor3.moveTo(0);
+
+  motor4.setMaxSpeed(300.0);
+  motor4.setAcceleration(20.0);
+  motor4.moveTo(0);
+
   Serial.println("OK");
 }
 
@@ -48,25 +60,29 @@ void loop(){
           readString += c;
         }
         if (c == '\n') { 
-//          client.println("HTTP/1.1 200 OK");
-//          client.println("Content-Type: application/json");
-//          client.println("");
-//          client.println("{}");
-          client.stop();
           String s = midString(readString, "=", " HTTP/1.1");
           Serial.println(s);
           if(readString.indexOf("rotation") > 0) {
-            motor1.step(s.toInt());
+            motor1.moveTo(s.toInt());
           } else if(readString.indexOf("elevation") > 0) { 
-            motor2.step(s.toInt());     
+            motor2.moveTo(s.toInt());     
           } else if(readString.indexOf("extension") > 0) { 
-            motor3.step(s.toInt());     
+            motor3.moveTo(s.toInt());     
           } else if(readString.indexOf("gripper") > 0) { 
-            motor4.step(s.toInt());     
+            motor4.moveTo(s.toInt());     
           }
+          client.println("HTTP/1.1 200 OK");
+          client.println("Content-Type: application/json");
+          client.println("");
+          client.println("{}");
+          client.stop();
           readString="";
         }
       }
     }
   }
+  motor1.run();
+  motor2.run();
+  motor3.run();
+  motor4.run();
 }
